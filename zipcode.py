@@ -1,27 +1,34 @@
-import csv, locale
-locale.setlocale(locale.LC_ALL, '')
+import csv
+
+states_all = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY']
 
 
 def prettyPrint(dic):
 
     for elem in dic: 
-
-        amt = dic[elem]
-
-        print("%5s | $%.2f " % (elem, locale.currency( float(amt) ) ) )
+        print("{} | ${:>13,.2f} ".format(elem, dic[elem]))
 
 
-def process(year):
-    fn = ""
-    if year == "2019":
-        fn = "./data/17zpallagi.csv"
-    elif year == "2018":
-        fn = "./data/18zpallagi.csv"
-    elif year == "2017":
-        fn = "./data/19zpallagi.csv"
-    
-    else:
-        print("Year format not recognized, or no data on this year")
+def avgAll(reader):
+        pass
+
+
+def process(inp):
+
+    try:
+        if 2019 >= int(inp) >= 2013:
+            fn = f"./data/{inp[2:]}zpallagi.csv"
+            print()
+        else:
+            print("Year format not recognized, or no data on this year")
+            return
+    except ValueError:
+        if inp in states_all:
+            print(f"Looks like you entered a state {inp}")
+            print(len(states_all))
+        else:
+            print("State format not recognized")
+        
         return
 
     fh = open(fn, "r", newline='')
@@ -44,7 +51,6 @@ def process(year):
         except ValueError:
             agi_idx = line.index("A00100")
             tia_idx = line.index("A02650")
-            print(state, line[tia_idx], line[agi_idx])
             continue
 
         if state in agis:
@@ -55,16 +61,18 @@ def process(year):
             agis[state] = agi
             tias[state] = tia
 
-    print("Average AGI per state in %d: " % int(year))
+    fh.close()
+
+    print("Average AGI per state in %d: " % int(inp))
     prettyPrint(agis)
-    print("\nAverage TIA per state in %d: " % int(year))
+    print("\nAverage TIA per state in %d: " % int(inp))
     prettyPrint(tias)
 
 
 
 def user_interface():
-    print("ZIP CODE DATA ANALYSIS")
-    print("Please enter a year:")
+    print("\nZIP CODE DATA ANALYSIS")
+    print("Please enter a year (2013-2019, inclusive):")
     process(input(">> "))
 
     
@@ -76,6 +84,5 @@ user_interface()
 """
 What is the average AGI per state? 
 For a given state, which zip codes have the highest average AGI? 
-
 
 """
